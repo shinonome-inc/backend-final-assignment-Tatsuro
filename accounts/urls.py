@@ -1,9 +1,10 @@
-from django.urls import path, include
+from django.urls import path
 
 from . import views
 
 app_name = 'accounts'
 urlpatterns = [
+    path('signup/', views.SignupView.as_view(), name='signup'),
     # path('', views.WelcomeView.as_view(), name='welcome'),
     # path('signup/', views.SignUpView.as_view(), name='signup'),
     # path('home/', views.HomeView.as_view(), name='home'),
