@@ -18,6 +18,4 @@ class SignupView(CreateView):
 
         if user is not None:
             login(self.request, user)
-        return response
-        
-        
+        return response        
