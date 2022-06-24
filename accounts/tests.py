@@ -1,6 +1,6 @@
 from django.test import TestCase
-from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 
 CustomUser = get_user_model()
 
@@ -54,6 +54,7 @@ class TestSignUpView(TestCase):
             'email': 'test@example.com',
             'password1': 'pass0000',
             'password2': 'pass0000',
+            'age' : '22',
         }
         response_empty_username = self.client.post(reverse('accounts:signup'), data_empty_username)
         self.assertEquals(response_empty_username.status_code, 200)
@@ -68,6 +69,7 @@ class TestSignUpView(TestCase):
              'email':'',
              'password1':'test0000',
              'password2':'test0000',
+             'age' : '22',
          }
         response_empty_email = self.client.post(reverse('accounts:signup'), data_empty_email)
         self.assertEquals(response_empty_email.status_code,200)
@@ -82,6 +84,7 @@ class TestSignUpView(TestCase):
              'email':'test@example.com',
              'password1':'',
              'password2':'',
+             'age' : '22',
          }
         response_empty_password = self.client.post(reverse('accounts:signup'), data_empty_password)
         self.assertEquals(response_empty_password.status_code, 200)
@@ -97,6 +100,7 @@ class TestSignUpView(TestCase):
              'email':'test@example.com',
              'password1':'pass0000',
              'password2':'pass0000',
+             'age' : '22',
          }
         
         data_duplicated = {
@@ -104,6 +108,7 @@ class TestSignUpView(TestCase):
              'email':'test@example.com',
              'password1':'pass0000',
              'password2':'pass0000',
+             'age' : '22',
         }
         self.client.post(reverse('accounts:signup'), data)
         response_duplicated = self.client.post(reverse('accounts:signup'), data_duplicated)
@@ -118,6 +123,7 @@ class TestSignUpView(TestCase):
              'email':'test',
              'password1':'pass0000',
              'password2':'pass0000',
+             'age' : '22',
          }
         response_invalid_email = self.client.post(reverse('accounts:signup'), data_invalid_email)
         self.assertEquals(response_invalid_email.status_code, 200)
@@ -132,6 +138,7 @@ class TestSignUpView(TestCase):
              'email':'test@example.com',
              'password1':'p',
              'password2':'p',
+             'age' : '22',
          }
         response_short_password = self.client.post(reverse('accounts:signup'), data_short_password)
         self.assertEquals(response_short_password.status_code, 200)
@@ -146,6 +153,8 @@ class TestSignUpView(TestCase):
              'email':'test@example.com',
              'password1':'test0000',
              'password2':'test0000',
+             'age' : '22',
+
          }
         response_password_similar_to_username = self.client.post(reverse('accounts:signup'), data_password_similar_to_username)
         self.assertEquals(response_password_similar_to_username.status_code, 200)
@@ -161,6 +170,7 @@ class TestSignUpView(TestCase):
              'email':'test@example.com',
              'password1':'12345678',
              'password2':'12345678',
+             'age' : '22',
          }
         response_password_only_numbers = self.client.post(reverse('accounts:signup'), data_password_only_numbers)
         self.assertEquals(response_password_only_numbers.status_code, 200)
@@ -175,6 +185,7 @@ class TestSignUpView(TestCase):
              'email':'test@example.com',
              'password1':'pass0000',
              'password2':'pas1111',
+             'age' : '22',
          }
         response_mismatch_password = self.client.post(reverse('accounts:signup'), data_mismatch_password)
         self.assertEquals(response_mismatch_password.status_code, 200)
