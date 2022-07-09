@@ -128,3 +128,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # 以下全て追加
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "welcome:home"
+LOGOUT_REDIRECT_URL = "accounts:login"
+
