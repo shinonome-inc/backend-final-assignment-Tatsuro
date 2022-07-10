@@ -5,11 +5,12 @@ from django.urls import reverse_lazy
 
 from .forms import SignupForm
 
+
 class SignupView(CreateView):
 
     form_class = SignupForm
-    success_url = reverse_lazy('welcome:home')
-    template_name = 'registration/signup.html'
+    success_url = reverse_lazy("welcome:home")
+    template_name = "registration/signup.html"
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -20,13 +21,10 @@ class SignupView(CreateView):
             login(self.request, user)
             return response
 
+
 class LoginView(LoginView):
     template_name = "registration/login.html"
 
 
 class LogoutView(LogoutView):
     template_name = "registration/login.html"
-
-
-    
-    
