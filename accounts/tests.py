@@ -29,7 +29,7 @@ class TestSignUpView(TestCase):
         }
         response = self.client.post(reverse("accounts:signup"), data)
         self.assertRedirects(
-            response, reverse("welcome:home"), status_code=302, target_status_code=200
+            response, reverse("accounts:home"), status_code=302, target_status_code=200
         )
         self.assertTrue(CustomUser.objects.exists())
 
@@ -259,7 +259,7 @@ class TestHomeView(TestCase):
     def test_success_get(self):
         # リクエストを送信
 
-        response_get = self.client.get(reverse("welcome:home"))
+        response_get = self.client.get(reverse("accounts:home"))
         self.assertEquals(response_get.status_code, 200)
         self.assertTemplateUsed(response_get, "home.html")
 
