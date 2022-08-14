@@ -1,9 +1,10 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, ListView
 from django.urls import reverse_lazy
 
 from .forms import SignupForm
+from tweets.models import Tweet
 
 
 class SignupView(CreateView):
@@ -22,8 +23,12 @@ class SignupView(CreateView):
             return response
 
 
-class HomeView(TemplateView):
+class HomeView(ListView):
+    model = Tweet
     template_name = "home.html"
+    ordering = ["-date_posted"]
+    queryset = Tweet.objects.select_related("user")
+    context_object_name = "tweet_list"
 
 
 class LoginView(LoginView):
