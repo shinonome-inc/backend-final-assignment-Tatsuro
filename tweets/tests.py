@@ -18,7 +18,7 @@ class TestTweetCreateView(TestCase):
         self.assertTemplateUsed(response, "tweets/tweet_create.html")
 
     # 有効なcontentのデータでリクエストを送信
-    def test__post_success(self):
+    def test_post_success(self):
         data = {"content": "First tweet"}
         response = self.client.post(reverse("tweets:create"), data)
         self.assertRedirects(
