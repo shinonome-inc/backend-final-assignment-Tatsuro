@@ -7,7 +7,6 @@ from .forms import TweetForm
 
 
 class TweetCreateView(LoginRequiredMixin, CreateView):
-
     form_class = TweetForm
     template_name = "tweets/tweet_create.html"
     success_url = reverse_lazy("accounts:home")
@@ -23,7 +22,6 @@ class TweetDetailView(LoginRequiredMixin, DetailView):
 
 
 class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-
     template_name = "tweets/tweet_delete.html"
     model = Tweet
     success_url = reverse_lazy("accounts:home")
