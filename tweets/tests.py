@@ -8,7 +8,7 @@ CustomUser = get_user_model()
 
 class TestTweetCreateView(TestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(username="test")
+        self.user = CustomUser.objects.create_user(username="user")
         self.client.force_login(self.user)
 
     # リクエストを送信
@@ -50,7 +50,7 @@ class TestTweetCreateView(TestCase):
 
 class TestTweetDetailView(TestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(username="test")
+        self.user = CustomUser.objects.create_user(username="user")
         self.client.force_login(self.user)
         self.tweet = Tweet.objects.create(user=self.user, content="test")
 
