@@ -4,4 +4,13 @@
 
 {% block content %}
 <h2>Home</h2>
+<a class="btn" href="{% url 'tweets:create' %}">Tweet</a>
+{% for tweet in tweet_list %}
+<div class="tweet_block">
+    <h2 class="sub_title">{{ tweet.content }}</h2>
+    <small>{{ tweet.created_at }}{{tweet.user.username}}</small>
+    <a href="{% url 'tweets:detail' tweet.pk %}">Check it out</a>
+</div>
+{% endfor %}
+
 {% endblock %}
