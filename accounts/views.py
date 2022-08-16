@@ -8,7 +8,6 @@ from tweets.models import Tweet
 
 
 class SignupView(CreateView):
-
     form_class = SignupForm
     success_url = reverse_lazy("accounts:home")
     template_name = "registration/signup.html"
@@ -26,7 +25,7 @@ class SignupView(CreateView):
 class HomeView(ListView):
     model = Tweet
     template_name = "home.html"
-    ordering = ["-date_posted"]
+    ordering = ["-created_at"]
     queryset = Tweet.objects.select_related("user")
     context_object_name = "tweet_list"
 

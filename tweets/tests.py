@@ -66,11 +66,15 @@ class TestTweetDetailView(TestCase):
 
 class TestTweetDeleteView(TestCase):
     def setUp(self):
-        self.user1 = CustomUser.objects.create_user(
-            username="test1", email="test1@example.com"
+        self.user = CustomUser.objects.create_user(
+            username="user", email="test@example.com"
         )
-        self.client.force_login(self.user1)
-        self.tweet = Tweet.objects.create(user=self.user1, content="test")
+        self.user2 = CustomUser.objects.create_user(
+            username="another_user", email="test2@example.com"
+        )
+        self.tweet = Tweet.objects.create(user=self.user, content="test")
+        self.tweet2 = Tweet.objects.create(user=self.user2, content="test")
+        self.client.force_login(self.user)
 
     # リクエストを送信
     def test_post_success(self):
@@ -80,22 +84,19 @@ class TestTweetDeleteView(TestCase):
         self.assertRedirects(
             response, reverse("accounts:home"), status_code=302, target_status_code=200
         )
-        self.assertEqual(Tweet.objects.count(), 0)
+        self.assertEqual(Tweet.objects.count(), 1)
 
     # 存在しないtweetに対してリクエストを送信
     def test_post_failure_with_not_exist_tweet(self):
-        response = self.client.post(reverse("tweets:delete", kwargs={"pk": 2}))
+        response = self.client.post(reverse("tweets:delete", kwargs={"pk": 3}))
         self.assertEquals(response.status_code, 404)
         self.assertTrue(Tweet.objects.exists())
 
     # 別のユーザーが作成したTweetに対してリクエストを送信
     def test_post_failure_with_incorrect_user(self):
-        self.user2 = CustomUser.objects.create_user(
-            username="test2", email="test2@example.com"
-        )
-        self.client.force_login(self.user2)
+
         response = self.client.post(
-            reverse("tweets:delete", kwargs={"pk": self.tweet.pk})
+            reverse("tweets:delete", kwargs={"pk": self.tweet2.pk})
         )
         self.assertEqual(response.status_code, 403)
         self.assertTrue(Tweet.objects.exists())

@@ -3,7 +3,6 @@ from django.views.generic import CreateView, DetailView, DeleteView
 from .models import Tweet
 from django.urls import reverse_lazy
 
-# from django.http import Http404
 from .forms import TweetForm
 
 
@@ -16,8 +15,6 @@ class TweetCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
-
-    # ログインユーザーと結びつけてるのは分かったがinstanceの意味がよくわからん
 
 
 class TweetDetailView(LoginRequiredMixin, DetailView):
@@ -34,5 +31,3 @@ class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         self.object = self.get_object()
         return self.object.user == self.request.user
-
-    #  user = self.request.userとしてreturn user.pk == self.kwargs['pk']ではダメっぽい？・・・
