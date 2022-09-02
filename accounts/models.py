@@ -10,5 +10,17 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
 
 
-# class FriendShip(models.Model):
-#     pass
+class FriendShip(models.Model):
+    following = models.ForeignKey(
+        CustomUser,
+        related_name="following",
+        on_delete=models.CASCADE,
+    )
+    follower = models.ForeignKey(
+        CustomUser,
+        related_name="follower",
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return f"{self.follower}follow{self.following}"
