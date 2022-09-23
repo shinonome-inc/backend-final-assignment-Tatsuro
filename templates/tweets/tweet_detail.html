@@ -4,8 +4,7 @@
 <small>{{ tweet.user.username }}</small>
 <p>{{ tweet.content }}</p>
 <small>{{ tweet.created_at }}</small>
-<small><a href="{% url 'accounts:follow' tweet.user.username %}">Follow</a></small>
-
+<a href="{% url 'accounts:profile' tweet.user.pk %}">User Profile</a>
 {% if request.user == tweet.user %}
 <p><a href="{% url 'tweets:delete' tweet.pk %}">Delete</a></p>
 {% else %}

@@ -3,12 +3,11 @@
 {% block title %}Following list{% endblock %}
 
 {% block content %}
-<h2>Following list : {{following_number}}</h2>
+<h2>Following list</h2>
 
 {% for following in following_list %}
 <div class="following_block">
     <h3 class="sub_title">{{ following.following }}</h3>
-    <a href="{% url 'accounts:unfollow' following.following.username %}">Unfollow</a>
 </div>
 {% endfor %}
 

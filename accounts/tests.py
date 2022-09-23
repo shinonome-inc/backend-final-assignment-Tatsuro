@@ -417,7 +417,7 @@ class TestFollowView(TestCase):
         response = self.client.post(
             reverse("accounts:follow", kwargs={"username": "user1"})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, 302)
         messages = list(get_messages(response.wsgi_request))
         message = str(messages[0])
         self.assertEqual(message, "You can't follow yourself.")
@@ -468,7 +468,7 @@ class TestUnfollowView(TestCase):
         response = self.client.post(
             reverse("accounts:unfollow", kwargs={"username": "user1"})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, 302)
         messages = list(get_messages(response.wsgi_request))
         message = str(messages[0])
         self.assertEqual(message, "This is your account.")
@@ -498,9 +498,7 @@ class TestFollowingListView(TestCase):
 
     def test_success_get(self):
         # フォローリスト一覧を表示・該当ユーザーのフォロー数を表示
-        response = self.client.get(
-            reverse("accounts:following_list", kwargs={"username": "user1"})
-        )
+        response = self.client.get(reverse("accounts:profile", kwargs={"pk": 1}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context["following_number"],
@@ -531,9 +529,7 @@ class TestFollowerListView(TestCase):
 
     def test_success_get(self):
         # フォロワーリスト一覧を表示・該当ユーザーのフォロワー数を表示
-        response = self.client.get(
-            reverse("accounts:follower_list", kwargs={"username": "user1"})
-        )
+        response = self.client.get(reverse("accounts:profile", kwargs={"pk": 1}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context["follower_number"],
