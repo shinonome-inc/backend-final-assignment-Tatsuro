@@ -90,7 +90,7 @@ class UnFollowView(LoginRequiredMixin, TemplateView):
         return HttpResponseRedirect(reverse_lazy("accounts:home"))
 
 
-class FollowingListView(LoginRequiredMixin, ListView):
+class FollowingListView(LoginRequiredMixin, TemplateView):
     model = User
     template_name = "accounts/following_list.html"
 
@@ -105,7 +105,7 @@ class FollowingListView(LoginRequiredMixin, ListView):
         return context
 
 
-class FollowerListView(LoginRequiredMixin, ListView):
+class FollowerListView(LoginRequiredMixin, TemplateView):
     model = User
     template_name = "accounts/follower_list.html"
 
@@ -134,6 +134,3 @@ class ProfileView(LoginRequiredMixin, DetailView):
             follower=self.request.user, following=user
         ).exists
         return context
-
-
-# class ProfileEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
