@@ -4,7 +4,10 @@
 
 {% block content %}
 <h2>Home</h2>
-<a class="btn" href="{% url 'tweets:create' %}">Tweet</a>
+<ul class="menu">
+    <li><a class="btn" href="{% url 'tweets:create' %}">Tweet</a></li>
+    <li><a href="{% url 'accounts:profile' user.pk %}">My Profile</a></li>
+</ul>
 {% for tweet in tweet_list %}
 <div class="tweet_block">
     <h2 class="sub_title">{{ tweet.content }}</h2>

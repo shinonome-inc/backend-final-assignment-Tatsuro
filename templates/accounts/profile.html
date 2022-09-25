@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+{% block content %}
+<h3>Profile</h3>
+<div class="profile_page">
+    <h2>{{profile_user.username}}</h2>
+    {% if user.username == profile_user.username %}
+    {% elif be_friends %}
+    <form action="{% url 'accounts:unfollow' profile_user.username %}" method="post">
+        {% csrf_token %}
+        <button type="submit">UnFollow</button>
+        {% else %}
+        <form action="{% url 'accounts:follow' profile_user.username %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Follow</button>
+            {% endif %}
+            <li><a href="{% url 'accounts:following_list' profile_user.username %}">Following list
+                    :{{following_number}}</a>
+            </li>
+            <li><a href="{% url 'accounts:follower_list' profile_user.username %}">Follower list
+                    :{{follower_number}}</a>
+            </li>
+</div>
+
+{% endblock %}

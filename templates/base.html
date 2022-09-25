@@ -12,11 +12,21 @@
   <header>
     {% if user.is_authenticated %}
     <a href="{% url 'accounts:logout' %}">Logout</a>
+    <a href="{% url 'accounts:home' %}">Home</a>
     {% else %}
     <a href="{% url 'accounts:login' %}">Login</a>
     <a href="{% url 'accounts:signup' %}">Signup</a>
     {% endif %}
   </header>
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <div {% if message.tags %}class="{{ message.tags }}" {% endif %}>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </ul>
+  {% endif %}
   {% block content %}{% endblock %}
 </body>
 

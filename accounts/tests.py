@@ -1,10 +1,12 @@
 from django.urls import reverse
 from django.contrib.auth import SESSION_KEY, get_user_model
+from django.contrib.messages import get_messages
 from django.test import TestCase
 
 from mysite import settings
+from .models import FriendShip
 
-CustomUser = get_user_model()
+User = get_user_model()
 
 
 class TestSignUpView(TestCase):
@@ -31,7 +33,7 @@ class TestSignUpView(TestCase):
         self.assertRedirects(
             response, reverse("accounts:home"), status_code=302, target_status_code=200
         )
-        self.assertTrue(CustomUser.objects.exists())
+        self.assertTrue(User.objects.exists())
 
     def test_failure_post_with_empty_form(self):
         # 空のデータでリクエストを送信
@@ -45,7 +47,7 @@ class TestSignUpView(TestCase):
         }
         response_empty = self.client.post(reverse("accounts:signup"), data_empty)
         self.assertEquals(response_empty.status_code, 200)
-        self.assertFalse(CustomUser.objects.exists())
+        self.assertFalse(User.objects.exists())
         self.assertFormError(
             response_empty, "form", "username", "This field is required."
         )
@@ -74,7 +76,7 @@ class TestSignUpView(TestCase):
         self.assertFormError(
             response_empty_username, "form", "username", "This field is required."
         )
-        self.assertFalse(CustomUser.objects.exists())
+        self.assertFalse(User.objects.exists())
 
     def test_failure_post_with_empty_email(self):
         # emailが空のデータでリクエストを送信
@@ -93,7 +95,7 @@ class TestSignUpView(TestCase):
         self.assertFormError(
             response_empty_email, "form", "email", "This field is required."
         )
-        self.assertFalse(CustomUser.objects.exists())
+        self.assertFalse(User.objects.exists())
 
     def test_failure_post_with_empty_password(self):
         # passwordが空のデータでリクエストを送信
@@ -115,7 +117,7 @@ class TestSignUpView(TestCase):
         self.assertFormError(
             response_empty_password, "form", "password2", "This field is required."
         )
-        self.assertFalse(CustomUser.objects.exists())
+        self.assertFalse(User.objects.exists())
 
     def test_failure_post_with_duplicated_user(self):
         # 既に存在するユーザーのデータでリクエストを送信
@@ -161,7 +163,7 @@ class TestSignUpView(TestCase):
             reverse("accounts:signup"), data_invalid_email
         )
         self.assertEquals(response_invalid_email.status_code, 200)
-        self.assertFalse(CustomUser.objects.exists())
+        self.assertFalse(User.objects.exists())
         self.assertFormError(
             response_invalid_email, "form", "email", "Enter a valid email address."
         )
@@ -180,7 +182,7 @@ class TestSignUpView(TestCase):
             reverse("accounts:signup"), data_short_password
         )
         self.assertEquals(response_short_password.status_code, 200)
-        self.assertFalse(CustomUser.objects.exists())
+        self.assertFalse(User.objects.exists())
         self.assertFormError(
             response_short_password,
             "form",
@@ -202,7 +204,7 @@ class TestSignUpView(TestCase):
             reverse("accounts:signup"), data_password_similar_to_username
         )
         self.assertEquals(response_password_similar_to_username.status_code, 200)
-        self.assertFalse(CustomUser.objects.exists())
+        self.assertFalse(User.objects.exists())
         self.assertFormError(
             response_password_similar_to_username,
             "form",
@@ -224,7 +226,7 @@ class TestSignUpView(TestCase):
             reverse("accounts:signup"), data_password_only_numbers
         )
         self.assertEquals(response_password_only_numbers.status_code, 200)
-        self.assertFalse(CustomUser.objects.exists())
+        self.assertFalse(User.objects.exists())
         self.assertFormError(
             response_password_only_numbers,
             "form",
@@ -246,7 +248,7 @@ class TestSignUpView(TestCase):
             reverse("accounts:signup"), data_mismatch_password
         )
         self.assertEquals(response_mismatch_password.status_code, 200)
-        self.assertFalse(CustomUser.objects.exists())
+        self.assertFalse(User.objects.exists())
         self.assertFormError(
             response_mismatch_password,
             "form",
@@ -256,9 +258,15 @@ class TestSignUpView(TestCase):
 
 
 class TestHomeView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test",
+            password="pass0000",
+        )
+        self.client.force_login(self.user)
+
     def test_success_get(self):
         # リクエストを送信
-
         response_get = self.client.get(reverse("accounts:home"))
         self.assertEquals(response_get.status_code, 200)
         self.assertTemplateUsed(response_get, "home.html")
@@ -266,14 +274,13 @@ class TestHomeView(TestCase):
 
 class TestLoginView(TestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(
+        self.user = User.objects.create_user(
             username="test",
             password="pass0000",
         )
 
     def test_success_get(self):
         # リクエストを送信
-
         response_get = self.client.get(reverse("accounts:login"))
         self.assertEquals(response_get.status_code, 200)
         self.assertTemplateUsed(response_get, "registration/login.html")
@@ -330,7 +337,7 @@ class TestLoginView(TestCase):
 
 class TestLogoutView(TestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(
+        self.user = User.objects.create_user(
             username="test",
             password="pass0000",
         )
@@ -368,32 +375,163 @@ class TestUserProfileEditView(TestCase):
 
 
 class TestFollowView(TestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(
+            username="user1",
+            email="test1@example.com",
+            password="pass1111",
+        )
+        self.user2 = User.objects.create_user(
+            username="user2",
+            email="test2@example.com",
+            password="pass2222",
+        )
+        self.client.force_login(self.user1)
+
     def test_success_post(self):
-        pass
+        # リクエストを送信
+        response = self.client.post(
+            reverse("accounts:follow", kwargs={"username": "user2"})
+        )
+        self.assertRedirects(
+            response,
+            reverse("accounts:home"),
+            status_code=302,
+            target_status_code=200,
+        )
+        self.assertTrue(FriendShip.objects.filter(follower=self.user1).exists)
 
     def test_failure_post_with_not_exist_user(self):
-        pass
+        # 存在しないユーザーに対してリクエストを送信
+        response = self.client.post(
+            reverse("accounts:follow", kwargs={"username": "user3"})
+        )
+        self.assertEquals(response.status_code, 404)
+        messages = list(get_messages(response.wsgi_request))
+        message = str(messages[0])
+        self.assertEqual(message, "This user does not exist.")
+        self.assertEquals(FriendShip.objects.filter(follower=self.user1).count(), 0)
 
     def test_failure_post_with_self(self):
-        pass
+        # 自分自身に対してリクエストを送信
+        response = self.client.post(
+            reverse("accounts:follow", kwargs={"username": "user1"})
+        )
+        self.assertEquals(response.status_code, 302)
+        messages = list(get_messages(response.wsgi_request))
+        message = str(messages[0])
+        self.assertEqual(message, "You can't follow yourself.")
+        self.assertEquals(FriendShip.objects.filter(follower=self.user1).count(), 0)
 
 
 class TestUnfollowView(TestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(
+            username="user1",
+            email="test1@example.com",
+            password="pass1111",
+        )
+        self.user2 = User.objects.create_user(
+            username="user2",
+            email="test2@example.com",
+            password="pass2222",
+        )
+        self.client.force_login(self.user1)
+        FriendShip.objects.create(following=self.user2, follower=self.user1)
+
     def test_success_post(self):
-        pass
+        # リクエストを送信
+        response = self.client.post(
+            reverse("accounts:unfollow", kwargs={"username": "user2"}),
+        )
+        self.assertRedirects(
+            response,
+            reverse("accounts:home"),
+            status_code=302,
+            target_status_code=200,
+        )
+        self.assertEquals(FriendShip.objects.filter(follower=self.user1).count(), 0)
 
     def test_failure_post_with_not_exist_tweet(self):
-        pass
+        # 存在しないユーザーに対してリクエストを送信
+        response = self.client.post(
+            reverse("accounts:unfollow", kwargs={"username": "user3"})
+        )
+        self.assertEquals(response.status_code, 404)
+        messages = list(get_messages(response.wsgi_request))
+        message = str(messages[0])
+        self.assertEqual(message, "This user does not exist.")
+        self.assertTrue(FriendShip.objects.filter(follower=self.user1).exists)
 
     def test_failure_post_with_incorrect_user(self):
-        pass
+        # 自分自身にリクエストを送信
+        response = self.client.post(
+            reverse("accounts:unfollow", kwargs={"username": "user1"})
+        )
+        self.assertEquals(response.status_code, 302)
+        messages = list(get_messages(response.wsgi_request))
+        message = str(messages[0])
+        self.assertEqual(message, "This is your account.")
+        self.assertTrue(FriendShip.objects.filter(follower=self.user1).exists)
 
 
 class TestFollowingListView(TestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(
+            username="user1",
+            email="test1@example.com",
+            password="pass1111",
+        )
+        self.user2 = User.objects.create_user(
+            username="user2",
+            email="test2@example.com",
+            password="pass2222",
+        )
+        self.user3 = User.objects.create_user(
+            username="user3",
+            email="test3@example.com",
+            password="pass3333",
+        )
+        self.client.force_login(self.user1)
+        FriendShip.objects.create(following=self.user2, follower=self.user1)
+        FriendShip.objects.create(following=self.user3, follower=self.user1)
+
     def test_success_get(self):
-        pass
+        # フォローリスト一覧を表示・該当ユーザーのフォロー数を表示
+        response = self.client.get(reverse("accounts:profile", kwargs={"pk": 1}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["following_number"],
+            FriendShip.objects.filter(follower=self.user1).count(),
+        )
 
 
 class TestFollowerListView(TestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(
+            username="user1",
+            email="test1@example.com",
+            password="pass1111",
+        )
+        self.user2 = User.objects.create_user(
+            username="user2",
+            email="test2@example.com",
+            password="pass2222",
+        )
+        self.user3 = User.objects.create_user(
+            username="user3",
+            email="test3@example.com",
+            password="pass3333",
+        )
+        self.client.force_login(self.user1)
+        FriendShip.objects.create(following=self.user1, follower=self.user2)
+        FriendShip.objects.create(following=self.user1, follower=self.user3)
+
     def test_success_get(self):
-        pass
+        # フォロワーリスト一覧を表示・該当ユーザーのフォロワー数を表示
+        response = self.client.get(reverse("accounts:profile", kwargs={"pk": 1}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["follower_number"],
+            FriendShip.objects.filter(following=self.user1).count(),
+        )

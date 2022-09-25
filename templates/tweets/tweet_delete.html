@@ -6,7 +6,7 @@
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    {{ tweet.content }}Warning! This tweet is deleted, OK?
+    {{ tweet.content }} : Warning! This tweet is deleted, OK?
     <button type="submit">Delete</button>
 </form>
 {% endblock %}
