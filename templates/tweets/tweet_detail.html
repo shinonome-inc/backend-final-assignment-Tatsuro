@@ -2,12 +2,87 @@
 
 {% block content %}
 <small>{{ tweet.user.username }}</small>
-<p>{{ tweet.content }}</p>
+<div class="mt-2,mb-2">
+    {{ tweet.content }}
+</div>
 <small>{{ tweet.created_at }}</small>
+{% if is_user_like_for_tweet %}
+<button type="button" id="js-like-for-tweet" style="border:none;background:none" data-tweet_pk="{{tweet.pk}}"
+    data-is_liked="true">
+    <i class="fas fa-heart text-danger" id="js-like-for-tweet-icon"></i>
+</button>
+{% else %}
+<button type="button" id="js-like-for-tweet" style="border:none;background:none" data-tweet_pk="{{tweet.pk}}"
+    data-is_liked="false">
+    <i class="far fa-heart text-danger" id="js-like-for-tweet-icon"></i>
+</button>
+{% endif %}
+<span id="js-like-for-tweet-count">{{ like_number }}</span>
+<span>people liked it !!</span>
 <a href="{% url 'accounts:profile' tweet.user.pk %}">User Profile</a>
 {% if request.user == tweet.user %}
 <p><a href="{% url 'tweets:delete' tweet.pk %}">Delete</a></p>
 {% else %}
 {% endif %}
+
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript">
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    const $likeButton = document.getElementById("js-like-for-tweet")
+    const $is_liked = $likeButton.dataset.is_liked
+    const $tweet_pk = $likeButton.dataset.tweet_pk
+    $likeButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        let url = '';
+        if ($is_liked == "true") {
+            url = "{% url 'tweets:unlike' pk=0 %}".replace("0", $tweet_pk)
+        } else {
+            url = "{% url 'tweets:like' pk=0 %}".replace("0", $tweet_pk)
+        }
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+        }).then(response => {
+            return response.json();
+        }).then(response => {
+            const $counter = document.getElementById('js-like-for-tweet-count')
+            const $icon = document.getElementById('js-like-for-tweet-icon')
+            $counter.textContent = response.like_number
+            if ($is_liked == "true") {
+                $likeButton.dataset.$is_liked == "false"
+                $icon.classList.remove('fas')
+                $icon.classList.add('far')
+                $icon.id = 'js-like-for-tweet-icon'
+            } else {
+                $likeButton.dataset.$is_liked == "true"
+                $icon.classList.remove('far')
+                $icon.classList.add('fas')
+                $icon.id = 'js-like-for-tweet-icon'
+            }
+        }).catch(error => {
+            console.log(error)
+        });
+    });
+</script>
 
 {% endblock %}
