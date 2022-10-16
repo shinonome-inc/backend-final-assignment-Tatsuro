@@ -14,7 +14,7 @@ from django.urls import reverse_lazy
 
 from .models import FriendShip
 from .forms import SignupForm
-from tweets.models import Tweet, Like
+from tweets.models import Like, Tweet
 
 User = get_user_model()
 

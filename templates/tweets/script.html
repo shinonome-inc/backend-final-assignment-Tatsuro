@@ -18,11 +18,11 @@
     const likeButtons = document.getElementsByClassName("like_button")
     for (const likeButton of likeButtons) {
         const tweet_pk = likeButton.dataset.tweet_pk
+        let is_liked = likeButton.dataset.is_liked
         likeButton.addEventListener('click', (e) => {
             e.preventDefault();
             let url = '';
-            const element = e.currentTarget
-            if (element.dataset.is_liked == "true") {
+            if (is_liked == "true") {
                 url = "{% url 'tweets:unlike' pk=0 %}".replace("0", tweet_pk)
             } else {
                 url = "{% url 'tweets:like' pk=0 %}".replace("0", tweet_pk)
@@ -39,13 +39,13 @@
                 const counter = document.getElementById('js-like-for-tweet-count-' + response.tweet_pk)
                 const icon = document.getElementById('js-like-for-tweet-icon-' + response.tweet_pk)
                 counter.textContent = response.like_number
-                if (element.dataset.is_liked == 'true') {
-                    element.dataset.is_liked = "false"
+                if (is_liked == 'true') {
+                    is_liked = "false"
                     icon.classList.remove('fas')
                     icon.classList.add('far')
                     icon.id = ('js-like-for-tweet-icon-' + response.tweet_pk)
                 } else {
-                    element.dataset.is_liked = "true"
+                    is_liked = "true"
                     icon.classList.remove('far')
                     icon.classList.add('fas')
                     icon.id = ('js-like-for-tweet-icon-' + response.tweet_pk)
