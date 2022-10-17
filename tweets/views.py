@@ -22,6 +22,7 @@ class TweetCreateView(LoginRequiredMixin, CreateView):
 class TweetDetailView(LoginRequiredMixin, DetailView):
     model = Tweet
     template_name = "tweets/tweet_detail.html"
+    queryset = Tweet.objects.select_related("user").prefetch_related("like_set")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -30,9 +31,6 @@ class TweetDetailView(LoginRequiredMixin, DetailView):
             "tweet", flat=True
         )
         return context
-
-    def get_queryset(self):
-        return Tweet.objects.select_related("user")
 
 
 class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):

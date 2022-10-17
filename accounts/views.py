@@ -39,6 +39,11 @@ class HomeView(ListView):
     template_name = "home.html"
     ordering = ["-created_at"]
     context_object_name = "tweet_list"
+    queryset = (
+        Tweet.objects.select_related("user")
+        .prefetch_related("like_set")
+        .order_by("-created_at")
+    )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -47,13 +52,6 @@ class HomeView(ListView):
             "tweet", flat=True
         )
         return context
-
-    def get_queryset(self):
-        return (
-            Tweet.objects.select_related("user")
-            .prefetch_related("like_set")
-            .order_by("-created_at")
-        )
 
 
 class LoginView(LoginView):
