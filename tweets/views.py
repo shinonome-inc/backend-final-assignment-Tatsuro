@@ -25,12 +25,14 @@ class TweetDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["like_number"] = self.object.like_set.count()
+        context["like_count"] = self.object.like_set.count()
         context["like_list"] = Like.objects.filter(user=self.request.user).values_list(
             "tweet", flat=True
         )
-
         return context
+
+    def get_queryset(self):
+        return Tweet.objects.select_related("user")
 
 
 class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -48,7 +50,7 @@ class LikeView(LoginRequiredMixin, View):
         user = self.request.user
         tweet = get_object_or_404(Tweet, pk=kwargs["pk"])
         Like.objects.get_or_create(tweet=tweet, user=user)
-        context = {"like_number": tweet.like_set.count(), "tweet_pk": tweet.pk}
+        context = {"like_count": tweet.like_set.count(), "tweet_pk": tweet.pk}
 
         return JsonResponse(context)
 
@@ -58,6 +60,6 @@ class UnlikeView(LoginRequiredMixin, View):
         user = self.request.user
         tweet = get_object_or_404(Tweet, pk=kwargs["pk"])
         Like.objects.filter(user=user, tweet=tweet).delete()
-        context = {"like_number": tweet.like_set.count(), "tweet_pk": tweet.pk}
+        context = {"like_count": tweet.like_set.count(), "tweet_pk": tweet.pk}
 
         return JsonResponse(context)

@@ -38,7 +38,7 @@
             }).then(response => {
                 const counter = document.getElementById('js-like-for-tweet-count-' + response.tweet_pk)
                 const icon = document.getElementById('js-like-for-tweet-icon-' + response.tweet_pk)
-                counter.textContent = response.like_number
+                counter.textContent = response.like_count
                 if (is_liked == 'true') {
                     is_liked = "false"
                     icon.classList.remove('fas')
