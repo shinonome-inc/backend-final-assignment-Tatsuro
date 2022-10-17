@@ -37,7 +37,6 @@ class SignupView(CreateView):
 class HomeView(ListView):
     model = Tweet
     template_name = "home.html"
-    ordering = ["-created_at"]
     context_object_name = "tweet_list"
     queryset = (
         Tweet.objects.select_related("user")
