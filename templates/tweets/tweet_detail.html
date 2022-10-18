@@ -2,12 +2,19 @@
 
 {% block content %}
 <small>{{ tweet.user.username }}</small>
-<p>{{ tweet.content }}</p>
+<div class="mt-2,mb-2">
+    {{ tweet.content }}
+</div>
 <small>{{ tweet.created_at }}</small>
+{% include 'tweets/like.html' %}
 <a href="{% url 'accounts:profile' tweet.user.pk %}">User Profile</a>
 {% if request.user == tweet.user %}
 <p><a href="{% url 'tweets:delete' tweet.pk %}">Delete</a></p>
 {% else %}
 {% endif %}
 
+{% endblock %}
+
+{% block extrajs %}
+{% include 'tweets/script.html' %}
 {% endblock %}

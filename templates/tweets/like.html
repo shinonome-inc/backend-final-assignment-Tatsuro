@@ -1,0 +1,13 @@
+{% if tweet.pk in like_list %}
+<button class="like_button" id="js-like-for-tweet" style="border:none;background:none" data-tweet_pk="{{tweet.pk}}"
+    data-is_liked="true">
+    <i class="fas fa-heart text-danger" id="js-like-for-tweet-icon-{{tweet.pk}}"></i>
+</button>
+{% else %}
+<button class="like_button" id="js-like-for-tweet" style="border:none;background:none" data-tweet_pk="{{tweet.pk}}"
+    data-is_liked="false">
+    <i class="far fa-heart text-danger" id="js-like-for-tweet-icon-{{tweet.pk}}"></i>
+</button>
+{% endif %}
+<span id="js-like-for-tweet-count-{{tweet.pk}}">{{ tweet.like_set.count }}</span>
+<span>people liked it !!</span>

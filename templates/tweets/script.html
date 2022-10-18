@@ -1,0 +1,58 @@
+<script type="text/javascript">
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    const likeButtons = document.getElementsByClassName("like_button")
+    for (const likeButton of likeButtons) {
+        const tweet_pk = likeButton.dataset.tweet_pk
+        let is_liked = likeButton.dataset.is_liked
+        likeButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            let url = '';
+            if (is_liked == "true") {
+                url = "{% url 'tweets:unlike' pk=0 %}".replace("0", tweet_pk)
+            } else {
+                url = "{% url 'tweets:like' pk=0 %}".replace("0", tweet_pk)
+            }
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+            }).then(response => {
+                return response.json();
+            }).then(response => {
+                const counter = document.getElementById('js-like-for-tweet-count-' + response.tweet_pk)
+                const icon = document.getElementById('js-like-for-tweet-icon-' + response.tweet_pk)
+                counter.textContent = response.like_count
+                if (is_liked == 'true') {
+                    is_liked = "false"
+                    icon.classList.remove('fas')
+                    icon.classList.add('far')
+                    icon.id = ('js-like-for-tweet-icon-' + response.tweet_pk)
+                } else {
+                    is_liked = "true"
+                    icon.classList.remove('far')
+                    icon.classList.add('fas')
+                    icon.id = ('js-like-for-tweet-icon-' + response.tweet_pk)
+                }
+            }).catch(error => {
+                console.log(error)
+            });
+        });
+    }
+</script>

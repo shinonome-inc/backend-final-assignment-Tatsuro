@@ -14,7 +14,7 @@ from django.urls import reverse_lazy
 
 from .models import FriendShip
 from .forms import SignupForm
-from tweets.models import Tweet
+from tweets.models import Like, Tweet
 
 User = get_user_model()
 
@@ -37,9 +37,20 @@ class SignupView(CreateView):
 class HomeView(ListView):
     model = Tweet
     template_name = "home.html"
-    ordering = ["-created_at"]
-    queryset = Tweet.objects.select_related("user")
     context_object_name = "tweet_list"
+    queryset = (
+        Tweet.objects.select_related("user")
+        .prefetch_related("like_set")
+        .order_by("-created_at")
+    )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context["like_list"] = Like.objects.filter(user=user).values_list(
+            "tweet", flat=True
+        )
+        return context
 
 
 class LoginView(LoginView):
